@@ -21,18 +21,22 @@ ensure_two_sentiment_categories <- function(count_data) {
   if(!any(count_data == "positive")) {
     count_data <- rbind(count_data, df_positive)
   }
-  View(count_data)
   return(count_data)
 }
 
-# tokenize
-tokens <- data_frame(text = tweet_texts[1]) %>% unnest_tokens(word, text)
+generate_sentiment_score <- function(text_data) {
+  # tokenize
+  tokens <- data_frame(text = text_data) %>% unnest_tokens(word, text)
 
-tokens %>%
-  inner_join(get_sentiments("bing")) %>%
-  count(sentiment) %>% # count the # of positive & negative words
-  ensure_two_sentiment_categories() %>%
-  spread(sentiment, n, fill = 0) %>% # made data wide rather than narrow
-  mutate(sentiment = positive - negative) # # of positive words - # of negative words
+  tokens %>%
+    inner_join(get_sentiments("bing")) %>%
+    count(sentiment) %>% # count the # of positive & negative words
+    ensure_two_sentiment_categories() %>%
+    spread(sentiment, n, fill = 0) %>% # made data wide rather than narrow
+    mutate(sentiment = positive - negative) # # of positive words - # of negative words
+}
 
+for(tweet_text in tweet_texts) {
+  print(generate_sentiment_score(tweet_text))
+}
 
