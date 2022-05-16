@@ -8,7 +8,6 @@ library(glue)
 library(stringr)
 
 tweet_file <- read.csv("/Users/joehoskisson/rprojects/social_media_censor_project/test_tweets.csv")
-tweet_texts <- tweet_file$tweet_text
 
 ensure_two_sentiment_categories <- function(count_data) {
   df_negative <- data.frame(sentiment=c("negative"), n=c(0))
@@ -36,7 +35,11 @@ generate_sentiment_score <- function(text_data) {
     mutate(sentiment = positive - negative) # # of positive words - # of negative words
 }
 
-for(tweet_text in tweet_texts) {
-  print(generate_sentiment_score(tweet_text))
+
+for(row in 1:nrow(tweet_file)) {
+  score_table <- generate_sentiment_score(tweet_file[row, "tweet_text"])
+
+  tweet_file[row, "sentiment_score"] <- score_table$sentiment
 }
 
+write_csv(tweet_file, "/Users/joehoskisson/rprojects/social_media_censor_project/test_tweets_with_sentiment.csv")
